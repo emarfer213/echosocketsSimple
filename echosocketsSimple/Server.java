@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static echosocketsSimple.Server.clientes;
+import static echosocketsSimple.Server.contadorClientes;
 
 public class Server {
     public static Set<PrintWriter> clientes = new HashSet<>();
+    public static int contadorClientes = 1;
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(5000);
         System.out.println("Servidor iniciado en el puerto 5000...");
@@ -25,7 +27,7 @@ public class Server {
 
 class ClientHandler implements Runnable {
     private final Socket socket;
-
+    String nombre = "cliente" + contadorClientes;
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
@@ -38,13 +40,14 @@ class ClientHandler implements Runnable {
 
             synchronized (clientes){
                 clientes.add(out);
+                contadorClientes++;
             }
 
             out.println("¡Bienvenido al servidor!");
 
             String mensaje;
             while ((mensaje = in.readLine()) != null) {
-                System.out.println("Cliente dice: " + mensaje);
+                System.out.println(nombre + " dice: " + mensaje);
                 synchronized (clientes){
                     for (PrintWriter writer : clientes){
                         writer.println(mensaje);
